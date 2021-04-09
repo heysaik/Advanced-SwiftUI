@@ -17,7 +17,6 @@
 		8B80D387260BD622008BA135 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B80D386260BD622008BA135 /* SettingsView.swift */; };
 		8B84EF3F260A7AC700D00057 /* VisualEffectBlur.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B84EF3E260A7AC700D00057 /* VisualEffectBlur.swift */; };
 		8BADF49E2608F4DF00AD4928 /* Advanced_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BADF49D2608F4DF00AD4928 /* Advanced_SwiftUIApp.swift */; };
-		8BADF4A02608F4DF00AD4928 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BADF49F2608F4DF00AD4928 /* ContentView.swift */; };
 		8BADF4A22608F4E000AD4928 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BADF4A12608F4E000AD4928 /* Assets.xcassets */; };
 		8BADF4A52608F4E000AD4928 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BADF4A42608F4E000AD4928 /* Preview Assets.xcassets */; };
 		8BADF4A72608F4E000AD4928 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BADF4A62608F4E000AD4928 /* Persistence.swift */; };
@@ -45,7 +44,6 @@
 		8B84EF3E260A7AC700D00057 /* VisualEffectBlur.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisualEffectBlur.swift; sourceTree = "<group>"; };
 		8BADF49A2608F4DF00AD4928 /* Advanced SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Advanced SwiftUI.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BADF49D2608F4DF00AD4928 /* Advanced_SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Advanced_SwiftUIApp.swift; sourceTree = "<group>"; };
-		8BADF49F2608F4DF00AD4928 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8BADF4A12608F4E000AD4928 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8BADF4A42608F4E000AD4928 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		8BADF4A62608F4E000AD4928 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
@@ -86,9 +84,6 @@
 				8BAEE2162618DE7900DFCDA1 /* GradientTextfield.swift */,
 				8BAEE21C2618E45C00DFCDA1 /* GradientIcon.swift */,
 				8BDAA446261D2A9600F607FD /* SignInWithAppleButton.swift */,
-				8BADF4B22608F55800AD4928 /* SignupView.swift */,
-				8B80D383260BCCB8008BA135 /* ProfileView.swift */,
-				8B80D386260BD622008BA135 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -127,7 +122,9 @@
 				8B80D37E260BCBAF008BA135 /* Helpers */,
 				8B80D37C260BCB9C008BA135 /* Views */,
 				8BADF49D2608F4DF00AD4928 /* Advanced_SwiftUIApp.swift */,
-				8BADF49F2608F4DF00AD4928 /* ContentView.swift */,
+				8BADF4B22608F55800AD4928 /* SignupView.swift */,
+				8B80D383260BCCB8008BA135 /* ProfileView.swift */,
+				8B80D386260BD622008BA135 /* SettingsView.swift */,
 				8BADF4A12608F4E000AD4928 /* Assets.xcassets */,
 				8BADF4A62608F4E000AD4928 /* Persistence.swift */,
 				8BADF4AB2608F4E000AD4928 /* Info.plist */,
@@ -242,7 +239,6 @@
 				8BADF4AA2608F4E000AD4928 /* Advanced_SwiftUI.xcdatamodeld in Sources */,
 				8BDAA44E261D2D7500F607FD /* SignInWithAppleButtonCoordinator.swift in Sources */,
 				8B80D387260BD622008BA135 /* SettingsView.swift in Sources */,
-				8BADF4A02608F4DF00AD4928 /* ContentView.swift in Sources */,
 				8B84EF3F260A7AC700D00057 /* VisualEffectBlur.swift in Sources */,
 				8B3F54D8261FB5C800C3CB9E /* GradientProfilePicture.swift in Sources */,
 				8BDAA447261D2A9600F607FD /* SignInWithAppleButton.swift in Sources */,

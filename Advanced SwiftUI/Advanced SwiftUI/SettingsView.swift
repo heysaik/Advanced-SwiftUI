@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct SettingsView: View {
     @State private var editingNameTextfield = false
@@ -30,11 +31,11 @@ struct SettingsView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Account.userID, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Account.userSince, ascending: true)],
+        predicate: NSPredicate(format: "userID == %@", Auth.auth().currentUser!.uid),
         animation: .default
     ) private var savedAccounts: FetchedResults<Account>
     @State private var currentAccount: Account?
-
     
     var body: some View {
         HStack() {
@@ -48,37 +49,41 @@ struct SettingsView: View {
                     .font(.callout)
                     .foregroundColor(Color.white.opacity(0.7))
                 // Choose Photo
-                HStack(spacing: 12) {
-                    TextfieldIcon(iconName: "person.crop.circle", passedImage: $inputImage, currentlyEditing: .constant(false))
-                    GradientText(text: "Choose Photo")
-                    Spacer()
-                }
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .circular)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-                .background(
-                    Color.init(red: 26/255, green: 20/255, blue: 51/255)
-                        .cornerRadius(16)
-                )
-                .onTapGesture {
+                Button {
                     self.showingImagePicker = true
+                } label: {
+                    HStack(spacing: 12) {
+                        TextfieldIcon(iconName: "person.crop.circle", passedImage: $inputImage, currentlyEditing: .constant(false))
+                        GradientText(text: "Choose Photo")
+                        Spacer()
+                    }
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .circular)
+                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    )
+                    .background(
+                        Color.init(red: 26/255, green: 20/255, blue: 51/255)
+                            .cornerRadius(16)
+                    )
                 }
                 
                 // Name Text Field
                 GradientTextfield(editingTextfield: $editingNameTextfield, textfieldString: $name, iconBounce: $nameIconBounce, textfieldPlaceholder: "Name", textfieldIconString: "textformat.alt")
                     .autocapitalization(.words)
                     .textContentType(.name)
+                    .disableAutocorrection(true)
                 
                 // Twitter Text Field
                 GradientTextfield(editingTextfield: $editingTwitterTextfield, textfieldString: $twitter, iconBounce: $twitterIconBounce, textfieldPlaceholder: "Twitter Handle", textfieldIconString: "scribble")
                     .autocapitalization(.none)
                     .keyboardType(.twitter)
+                    .disableAutocorrection(true)
                 
                 // Site Text Field
                 GradientTextfield(editingTextfield: $editingSiteTextfield, textfieldString: $site, iconBounce: $siteIconBounce, textfieldPlaceholder: "Website", textfieldIconString: "link")
                     .autocapitalization(.none)
                     .keyboardType(.webSearch)
+                    .disableAutocorrection(true)
                 
                 // Bio Text View
                 GradientTextfield(editingTextfield: $editingBioTextfield, textfieldString: $bio, iconBounce: $bioIconBounce, textfieldPlaceholder: "Bio", textfieldIconString: "text.justifyleft")

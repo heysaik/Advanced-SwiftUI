@@ -18,44 +18,46 @@ struct GradientButton: View {
     ]
     
     @State private var angle: Double = 0
-
+    
     let timer = Timer.publish(every: 1, on: .main, in: .default).autoconnect()
     
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                AngularGradient(gradient: Gradient(colors: gradient1), center: .center, angle: .degrees(angle))
-                    .blur(radius: 8.0)
-                    .mask(
-                        RoundedRectangle(cornerRadius: 16)
-                            .frame(maxWidth: geometry.size.width - 15)
-                            .frame(height: 50)
-                            .blur(radius: 8)
-                    )
-                    .onReceive(timer, perform: { _ in
-                        withAnimation(Animation.easeOut(duration: 10).repeatForever(autoreverses: false)) {
-                            self.angle += 50
-                        }
-                    })
-                GradientText(text: buttonTitle)
-                    .font(.headline)
-                    .frame(maxWidth: geometry.size.width - 15)
-                    .frame(height: 50)
-                    .background(
-                        Color("tertiaryBackground")
-                            .opacity(0.9)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16.0)
-                            .stroke(Color.white, lineWidth: 1.0)
-                            .blendMode(.normal)
-                            .opacity(0.7)
-                    )
-                    .cornerRadius(16.0)
+        Button(action: buttonAction, label: {
+            GeometryReader { geometry in
+                ZStack {
+                    AngularGradient(gradient: Gradient(colors: gradient1), center: .center, angle: .degrees(angle))
+                        .blur(radius: 8.0)
+                        .mask(
+                            RoundedRectangle(cornerRadius: 16)
+                                .frame(maxWidth: geometry.size.width - 15)
+                                .frame(height: 50)
+                                .blur(radius: 8)
+                        )
+                        .onReceive(timer, perform: { _ in
+                            withAnimation(Animation.easeOut(duration: 10).repeatForever(autoreverses: false)) {
+                                self.angle += 50
+                            }
+                        })
+                    GradientText(text: buttonTitle)
+                        .font(.headline)
+                        .frame(maxWidth: geometry.size.width - 15)
+                        .frame(height: 50)
+                        .background(
+                            Color("tertiaryBackground")
+                                .opacity(0.9)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16.0)
+                                .stroke(Color.white, lineWidth: 1.0)
+                                .blendMode(.normal)
+                                .opacity(0.7)
+                        )
+                        .cornerRadius(16.0)
+                }
             }
-        }
-        .frame(height: 100)
-        .onTapGesture(perform: buttonAction)
+            .frame(height: 100)
+            
+        })
     }
 }
 

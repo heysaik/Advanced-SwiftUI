@@ -19,9 +19,12 @@ struct ProfileView: View {
     @State private var alertMessage = "You are now a Pro member and can access all courses"
     @State var updater: Bool = false
 
+    @Environment(\.presentationMode) var presentationMode
+
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Account.userID, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Account.userSince, ascending: true)],
+        predicate: NSPredicate(format: "userID == %@", Auth.auth().currentUser!.uid),
         animation: .default
     ) private var savedAccounts: FetchedResults<Account>
     @State private var currentAccount: Account?
@@ -58,10 +61,11 @@ struct ProfileView: View {
                                 .font(.footnote)
                         }
                         Spacer()
-                        TextfieldIcon(iconName: "gearshape.fill", passedImage: .constant(nil), currentlyEditing: .constant(true))
-                            .onTapGesture {
-                                showSettingsView.toggle()
-                            }
+                        Button {
+                            showSettingsView.toggle()
+                        } label: {
+                            TextfieldIcon(iconName: "gearshape.fill", passedImage: .constant(nil), currentlyEditing: .constant(true))
+                        }
                     }
                     Rectangle()
                         .frame(height: 1)
@@ -142,40 +146,41 @@ struct ProfileView: View {
                 
                 .padding(.horizontal, 16)
                 
-                GradientText(text: "Restore Purchases")
-                    .font(Font.footnote.bold())
-                    .onTapGesture {
-                        Purchases.shared.restoreTransactions { (purchaserInfo, error) in
-                            if let info = purchaserInfo {
-                                if info.allPurchasedProductIdentifiers.contains("lifetime_pro_plan") {
-                                    currentAccount?.proMember = true
-                                    iapButtonTitle = "You are a Pro Member"
-                                    do {
-                                        try viewContext.save()
-                                        alertTitle = "Restore Successful"
-                                        alertMessage = "Your purchases have been restored"
-                                        showActionAlert.toggle()
-                                    } catch let error {
-                                        alertTitle = "Uh-oh!"
-                                        alertMessage = "Your purchases have been restored but the data has not been saved. \(error.localizedDescription)"
-                                        showActionAlert.toggle()
-                                    }
-                                } else {
-                                    currentAccount?.proMember = false
-                                    do {
-                                        try viewContext.save()
-                                        alertTitle = "Restore Unsuccessful"
-                                        alertMessage = error?.localizedDescription ?? "No previous purchases found to restore"
-                                        showActionAlert.toggle()
-                                    } catch let error {
-                                        alertTitle = "Restore Unsuccessful"
-                                        alertMessage = error.localizedDescription
-                                        showActionAlert.toggle()
-                                    }
+                Button {
+                    Purchases.shared.restoreTransactions { (purchaserInfo, error) in
+                        if let info = purchaserInfo {
+                            if info.allPurchasedProductIdentifiers.contains("lifetime_pro_plan") {
+                                currentAccount?.proMember = true
+                                iapButtonTitle = "You are a Pro Member"
+                                do {
+                                    try viewContext.save()
+                                    alertTitle = "Restore Successful"
+                                    alertMessage = "Your purchases have been restored"
+                                    showActionAlert.toggle()
+                                } catch let error {
+                                    alertTitle = "Uh-oh!"
+                                    alertMessage = "Your purchases have been restored but the data has not been saved. \(error.localizedDescription)"
+                                    showActionAlert.toggle()
+                                }
+                            } else {
+                                currentAccount?.proMember = false
+                                do {
+                                    try viewContext.save()
+                                    alertTitle = "Restore Unsuccessful"
+                                    alertMessage = error?.localizedDescription ?? "No previous purchases found to restore"
+                                    showActionAlert.toggle()
+                                } catch let error {
+                                    alertTitle = "Restore Unsuccessful"
+                                    alertMessage = error.localizedDescription
+                                    showActionAlert.toggle()
                                 }
                             }
                         }
                     }
+                } label: {
+                    GradientText(text: "Restore Purchases")
+                        .font(Font.footnote.bold())
+                }
                     .padding(.bottom)
                     
             }
@@ -188,6 +193,31 @@ struct ProfileView: View {
             )
             .cornerRadius(30)
             .padding(.horizontal)
+            
+            VStack{
+                Spacer()
+                Button {
+                    signOut()
+                } label: {
+                    Image(systemName: "arrow.turn.up.forward.iphone.fill")
+                        .foregroundColor(.white)
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                        .rotation3DEffect(Angle(degrees: 180), axis: (x: 0, y: 0, z: 1))
+                        .background(
+                            Circle()
+                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                .frame(width: 40, height: 40, alignment: .center)
+                                .overlay(
+                                    VisualEffectBlur(blurStyle: .dark)
+                                        .cornerRadius(20)
+                                        .frame(width: 40, height: 40, alignment: .center)
+                                )
+                        )
+
+                }
+
+            }
+            .padding(.bottom, 64)
         }
         .sheet(isPresented: $showSettingsView, content: {
             SettingsView()
@@ -201,7 +231,26 @@ struct ProfileView: View {
         .colorScheme(updater ? .dark : .dark)
         .onAppear() {
             // Check CloudKit
-            currentAccount = savedAccounts.first!
+            currentAccount = savedAccounts.first
+
+            if currentAccount == nil {
+                let userDataToSave = Account(context: viewContext)
+                userDataToSave.name = Auth.auth().currentUser!.displayName
+                userDataToSave.userID = Auth.auth().currentUser!.uid
+                userDataToSave.bio = nil
+                userDataToSave.numberOfCertificates = 0
+                userDataToSave.userSince = Date()
+                userDataToSave.proMember = false
+                userDataToSave.twitterHandle = nil
+                userDataToSave.website = nil
+                userDataToSave.profileImage = nil
+                do {
+                    try viewContext.save()
+                } catch let error {
+                    alertTitle = "Could not save user data"
+                    alertMessage = error.localizedDescription
+                }
+            }
             
             // Check Pro User
             if !currentAccount!.proMember {
@@ -225,6 +274,17 @@ struct ProfileView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
         return formatter.string(from: date)
+    }
+    
+    func signOut() {
+        do {
+            try Auth.auth().signOut()
+            presentationMode.wrappedValue.dismiss()
+        } catch let error {
+            alertTitle = "Could not log out"
+            alertMessage = error.localizedDescription
+            showActionAlert.toggle()
+        }
     }
 }
 

@@ -31,12 +31,12 @@ struct SignupView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Account.userID, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Account.userSince, ascending: true)],
         animation: .default
     ) private var savedAccounts: FetchedResults<Account>
-
+    
     private let generator = UISelectionFeedbackGenerator()
-
+    
     var body: some View {
         ZStack {
             Image(signupToggle ? "background-3" : "background-1")
@@ -70,10 +70,10 @@ struct SignupView: View {
                                 }
                             }
                         }
-                            .colorScheme(.dark)
-                            .foregroundColor(Color.white.opacity(0.7))
-                            .autocapitalization(.none)
-                            .textContentType(.emailAddress)
+                        .colorScheme(.dark)
+                        .foregroundColor(Color.white.opacity(0.7))
+                        .autocapitalization(.none)
+                        .textContentType(.emailAddress)
                     }
                     .frame(height: 52)
                     .overlay(
@@ -86,7 +86,7 @@ struct SignupView: View {
                             .cornerRadius(16)
                             .opacity(0.8)
                     )
-
+                    
                     HStack(spacing: 12) {
                         TextfieldIcon(iconName: "key.fill", passedImage: .constant(nil), currentlyEditing: $editingPasswordTextfield)
                             .scaleEffect(passwordIconBounce ? 1.2 : 1.0)
@@ -138,42 +138,46 @@ struct SignupView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 16) {
-                        HStack(spacing: 4) {
-                            Text(signupToggle ? "Already have an account?" : "Don't have an account?")
-                                .font(.footnote)
-                                .foregroundColor(Color.white.opacity(0.7))
-                            GradientText(text: signupToggle ? "Sign in" : "Sign up")
-                                .font(Font.footnote.bold())
-                        }
-                        .onTapGesture {
+                        Button(action: {
                             withAnimation(Animation.easeInOut(duration: 1.0)) {
                                 signupToggle.toggle()
                             }
-                            
-                        }
-                        
-                        if !signupToggle {
+                        }, label: {
                             HStack(spacing: 4) {
-                                Text("Forgot password?")
+                                Text(signupToggle ? "Already have an account?" : "Don't have an account?")
                                     .font(.footnote)
                                     .foregroundColor(Color.white.opacity(0.7))
-                                GradientText(text: "Reset Password")
+                                GradientText(text: signupToggle ? "Sign in" : "Sign up")
                                     .font(Font.footnote.bold())
                             }
-                            .onTapGesture {
+                        })
+                        
+                        
+                        if !signupToggle {
+                            Button(action: {
                                 self.sendPasswordResetEmail()
-                            }
+                            }, label: {
+                                HStack(spacing: 4) {
+                                    Text("Forgot password?")
+                                        .font(.footnote)
+                                        .foregroundColor(Color.white.opacity(0.7))
+                                    GradientText(text: "Reset Password")
+                                        .font(Font.footnote.bold())
+                                }
+                            })
                             
                             Rectangle()
                                 .frame(height: 1)
                                 .foregroundColor(Color.white.opacity(0.1))
-                            SignInWithAppleButton()
-                                .frame(height: 50)
-                                .cornerRadius(16)
-                                .onTapGesture {
-                                    signInHandler = SignInWithAppleButtonCoordinator()
-                                    signInHandler?.signInWithApple()
-                                }
+                            
+                            Button(action: {
+                                signInHandler = SignInWithAppleButtonCoordinator()
+                                signInHandler?.signInWithApple()
+                            }, label: {
+                                SignInWithAppleButton()
+                                    .frame(height: 50)
+                                    .cornerRadius(16)
+                            })
                         }
                     }
                 }
@@ -197,7 +201,7 @@ struct SignupView: View {
                         if savedAccounts.count == 0 {
                             let userDataToSave = Account(context: viewContext)
                             userDataToSave.name = currentUser.displayName
-                            userDataToSave.userID = UUID(uuidString: currentUser.uid)
+                            userDataToSave.userID = currentUser.uid
                             userDataToSave.bio = nil
                             userDataToSave.numberOfCertificates = 0
                             userDataToSave.userSince = Date()

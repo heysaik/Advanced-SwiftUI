@@ -7,15 +7,11 @@
         <attribute name="profileImage" optional="YES" attributeType="Binary"/>
         <attribute name="proMember" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="twitterHandle" optional="YES" attributeType="String"/>
-        <attribute name="userID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="userID" optional="YES" attributeType="String"/>
         <attribute name="userSince" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="website" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
-        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-    </entity>
     <elements>
-        <element name="Item" positionX="-63" positionY="-18" width="128" height="44"/>
         <element name="Account" positionX="-63" positionY="-9" width="128" height="164"/>
     </elements>
 </model>

@@ -15,7 +15,6 @@ struct GradientProfilePicture: View {
         Color.init(red: 109/255, green: 1, blue: 185/255),
         Color.init(red: 39/255, green: 232/255, blue: 1),
     ]
-    let timer = Timer.publish(every: 1, on: .main, in: .default).autoconnect()
 
     @State private var angle: Double = 0
 
@@ -23,15 +22,16 @@ struct GradientProfilePicture: View {
         ZStack {
             AngularGradient(gradient: Gradient(colors: gradient1), center: .center, angle: .degrees(angle))
                 .mask(
-                    Circle()                .frame(width: 70, height: 70, alignment: .center)
+                    Circle()
+                        .frame(width: 70, height: 70, alignment: .center)
                         .blur(radius: 8.0)
                 )
                 .blur(radius: 8.0)
-                .onReceive(timer, perform: { _ in
-                    withAnimation(Animation.easeOut(duration: 10).repeatForever(autoreverses: false)) {
-                        self.angle += 50
+                .onAppear {
+                    withAnimation(.linear(duration: 7)) {
+                        self.angle += 350
                     }
-                })
+                }
             Image(uiImage: profilePicture)
                 .resizable()
                 .aspectRatio(contentMode: .fill)

@@ -12,7 +12,6 @@ struct TextfieldIcon: View {
     @Binding var passedImage: UIImage?
     @Binding var currentlyEditing: Bool
     @State private var colorAngle = 180.0
-    let colorTimer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
@@ -31,9 +30,9 @@ struct TextfieldIcon: View {
                                         center: .center,
                                         angle: .degrees(colorAngle))
                             .blur(radius: 10)
-                            .onReceive(colorTimer) { _ in
-                                withAnimation {
-                                    colorAngle += 10
+                            .onAppear {
+                                withAnimation(.linear(duration: 7)) {
+                                    self.colorAngle += 350
                                 }
                             }
                     }

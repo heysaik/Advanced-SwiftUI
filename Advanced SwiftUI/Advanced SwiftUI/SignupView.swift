@@ -23,8 +23,10 @@ struct SignupView: View {
     @State private var signupToggle = true
     
     @State private var showAlertToggle = false
+    @State private var fadeImageToggle = true
     @State private var alertTitle = ""
     @State private var alertMessage = ""
+    @State private var rotationAngle = 0.0
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @State var signInHandler: SignInWithAppleButtonCoordinator?
@@ -43,6 +45,9 @@ struct SignupView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .edgesIgnoringSafeArea(.all)
+            Color("secondaryBackground")
+                .edgesIgnoringSafeArea(.all)
+                .opacity(fadeImageToggle ? 0 : 0.5)
             VStack {
                 VStack(alignment: .leading, spacing: 16) {
                     Text(signupToggle ? "Sign up" : "Sign in")
@@ -139,7 +144,17 @@ struct SignupView: View {
                     
                     VStack(alignment: .leading, spacing: 16) {
                         Button(action: {
-                            withAnimation(Animation.easeInOut(duration: 1.0)) {
+                            withAnimation(Animation.easeInOut(duration: 0.35)) {
+                                fadeImageToggle.toggle()
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                    withAnimation(.easeInOut(duration: 0.35)) {
+                                        self.fadeImageToggle.toggle()
+                                    }
+                                }
+                            }
+                            
+                            withAnimation(Animation.easeInOut(duration: 0.7)) {
+                                self.rotationAngle += 180
                                 signupToggle.toggle()
                             }
                         }, label: {
@@ -183,6 +198,7 @@ struct SignupView: View {
                 }
                 .padding(20)
             }
+            .rotation3DEffect(Angle(degrees: rotationAngle), axis: (x: CGFloat(0), y: CGFloat(1), z: CGFloat(0)))
             .alert(isPresented: $showAlertToggle, content: {
                 Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .cancel())
             })
@@ -211,7 +227,9 @@ struct SignupView: View {
                             userDataToSave.profileImage = nil
                             do {
                                 try viewContext.save()
-                                showProfileView.toggle()
+                                DispatchQueue.main.async {
+                                    showProfileView.toggle()
+                                }
                             } catch let error {
                                 alertTitle = "Could not save user data"
                                 alertMessage = error.localizedDescription
@@ -223,7 +241,8 @@ struct SignupView: View {
                     }
                 }
             }
-            .rotation3DEffect(self.signupToggle ? Angle(degrees: 360): Angle(degrees: 0), axis: (x: CGFloat(0), y: CGFloat(1), z: CGFloat(0)))
+            .rotation3DEffect(Angle(degrees: rotationAngle), axis: (x: CGFloat(0), y: CGFloat(1), z: CGFloat(0)))
+            
         }
         .fullScreenCover(isPresented: $showProfileView) {
             ProfileView()
@@ -254,7 +273,6 @@ struct SignupView: View {
                     showAlertToggle.toggle()
                     return
                 }
-                showProfileView.toggle()
             }
         } else {
             Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
@@ -262,8 +280,6 @@ struct SignupView: View {
                     alertTitle = "Uh-Oh!"
                     alertMessage = error!.localizedDescription
                     showAlertToggle.toggle()
-                } else {
-                    showProfileView.toggle()
                 }
             }
         }

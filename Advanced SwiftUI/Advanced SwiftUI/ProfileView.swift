@@ -28,7 +28,7 @@ struct ProfileView: View {
         animation: .default
     ) private var savedAccounts: FetchedResults<Account>
     @State private var currentAccount: Account?
-    
+    @State private var showLoader = false
     var body: some View {
         ZStack {
             Image("background-2")
@@ -74,15 +74,17 @@ struct ProfileView: View {
                         .foregroundColor(.white)
                         .font(.title2)
                         .bold()
-                    Label(
-                        title: { Text("Awarded \(currentAccount?.numberOfCertificates ?? 100) certificates since \(dateFormatter(currentAccount?.userSince ?? Date()))") },
-                        icon: { Image(systemName: "calendar") }
-                    )
-                    .foregroundColor(.white).opacity(0.7)
-                    .font(.footnote)
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(Color.white.opacity(0.1))
+                    if currentAccount?.numberOfCertificates != 0 {
+                        Label(
+                            title: { Text("Awarded \(currentAccount?.numberOfCertificates ?? 100) certificates since \(dateFormatter(currentAccount?.userSince ?? Date()))") },
+                            icon: { Image(systemName: "calendar") }
+                        )
+                        .foregroundColor(.white).opacity(0.7)
+                        .font(.footnote)
+                        Rectangle()
+                            .frame(height: 1)
+                            .foregroundColor(Color.white.opacity(0.1))
+                    }
                     HStack(spacing: 16) {
                         if currentAccount?.twitterHandle != nil {
                             Image("Twitter")
@@ -104,6 +106,7 @@ struct ProfileView: View {
                 GradientButton(buttonTitle: iapButtonTitle) {
                     if !(currentAccount?.proMember ?? true) {
                         // Purchase
+                        showLoader = true
                         Purchases.shared.offerings { (offerings, error) in
                             if let packages = offerings?.current?.availablePackages {
                                 Purchases.shared.purchasePackage(packages.first!) { (transaction, purchaserInfo, error, userCancelled) in
@@ -125,15 +128,20 @@ struct ProfileView: View {
                                             alertMessage = "Your purchase was successful but not synced to iCloud. \(error.localizedDescription)"
                                             showActionAlert.toggle()
                                         }
+                                        showLoader = false
                                     } else {
                                         alertTitle = "Purchase Failed"
                                         alertMessage = String(describing: error)
                                         showActionAlert.toggle()
+                                        showLoader = false
                                     }
                                 }
+                            } else {
+                                showLoader = false
                             }
                         }
                     } else {
+                        showLoader = false
                         alertTitle = "Purchase Successful!"
                         alertMessage = "You are now a Pro member and can access all courses"
                         showActionAlert.toggle()
@@ -147,6 +155,7 @@ struct ProfileView: View {
                 .padding(.horizontal, 16)
                 
                 Button {
+                    showLoader = true
                     Purchases.shared.restoreTransactions { (purchaserInfo, error) in
                         if let info = purchaserInfo {
                             if info.allPurchasedProductIdentifiers.contains("lifetime_pro_plan") {
@@ -162,6 +171,7 @@ struct ProfileView: View {
                                     alertMessage = "Your purchases have been restored but the data has not been saved. \(error.localizedDescription)"
                                     showActionAlert.toggle()
                                 }
+                                showLoader = false
                             } else {
                                 currentAccount?.proMember = false
                                 do {
@@ -174,7 +184,10 @@ struct ProfileView: View {
                                     alertMessage = error.localizedDescription
                                     showActionAlert.toggle()
                                 }
+                                showLoader = false
                             }
+                        } else {
+                            showLoader = false
                         }
                     }
                 } label: {
@@ -218,6 +231,11 @@ struct ProfileView: View {
 
             }
             .padding(.bottom, 64)
+            
+            if showLoader {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+            }
         }
         .sheet(isPresented: $showSettingsView, content: {
             SettingsView()

@@ -74,7 +74,7 @@ struct SettingsView: View {
                     .disableAutocorrection(true)
                 
                 // Twitter Text Field
-                GradientTextfield(editingTextfield: $editingTwitterTextfield, textfieldString: $twitter, iconBounce: $twitterIconBounce, textfieldPlaceholder: "Twitter Handle", textfieldIconString: "scribble")
+                GradientTextfield(editingTextfield: $editingTwitterTextfield, textfieldString: $twitter, iconBounce: $twitterIconBounce, textfieldPlaceholder: "Twitter Handle", textfieldIconString: "at")
                     .autocapitalization(.none)
                     .keyboardType(.twitter)
                     .disableAutocorrection(true)
